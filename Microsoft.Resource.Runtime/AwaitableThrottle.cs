@@ -26,6 +26,7 @@ namespace Microsoft.Resource.Runtime
         public Awaiter GetAwaiter()
         {
             TaskCompletionSource<bool> awaiter = null;
+
             lock (Thislock)
             {
                 if (_count < _maxConcurrent)
