@@ -1,11 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Resource.Runtime", "Microsoft.Resource.Runtime\Microsoft.Resource.Runtime.csproj", "{74064645-8A0B-4FFB-8FF8-EB97A54E7522}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Resource.Runtime.Test", "Microsoft.Resource.Runtime.Test\Microsoft.Resource.Runtime.Test.csproj", "{AC6A10DA-BC3B-430F-B334-C875D152ED4D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncThrottle.PerfTest", "AsyncThrottle.PerfTest\AsyncThrottle.PerfTest.csproj", "{7AD4B8CC-D44A-4C79-BCBC-E4465D92B53B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F6D31251-EE10-44AB-B469-4BEFABF9ABEC}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
