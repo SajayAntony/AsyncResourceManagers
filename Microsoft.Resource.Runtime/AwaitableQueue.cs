@@ -7,12 +7,15 @@ using System.Threading.Tasks;
 namespace Microsoft.Resource.Runtime
 {
     /// <summary>
-    /// 
+    /// An async awaitable queue implemenation that would enable 
+    /// a called to await for a value in the queue. 
+    /// An enqueue on the queue would trigger any awaiters on the queue
+    /// and schedule their continuations without blocking the enqueuer.      
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class AwaitableQueue<T>
     {
-        readonly Queue<QueuedAwaiter<T>> _readers = new Queue<QueuedAwaiter<T>>();
+        readonly Queue<QueueAwaiter<T>> _readers = new Queue<QueueAwaiter<T>>();
         readonly Queue<T> _outputs = new Queue<T>();
 
         object ThisLock
@@ -22,7 +25,7 @@ namespace Microsoft.Resource.Runtime
 
         #region Awaitables
 
-        public QueuedAwaiter<T> GetAwaiter()
+        public QueueAwaiter<T> GetAwaiter()
         {
 
             // If there is an output available then get the value immediately             
@@ -31,11 +34,11 @@ namespace Microsoft.Resource.Runtime
                 if (_outputs.Count > 0)
                 {
                     var result = _outputs.Dequeue();
-                    return QueuedAwaiter<T>.GetCompletedAwaiter(result);
+                    return QueueAwaiter<T>.GetCompletedAwaiter(result);
                 }
                 else
                 {
-                    var awaiter = QueuedAwaiter<T>.GetAwaiter();
+                    var awaiter = QueueAwaiter<T>.GetAwaiter();
                     _readers.Enqueue(awaiter);
                     return awaiter;
                 }
@@ -49,7 +52,7 @@ namespace Microsoft.Resource.Runtime
             // Writer is enqueing an object and 
             // if there is a reader we need to complete any reader. 
             // else we need to park the result into the queue.             
-            QueuedAwaiter<T> awaiter = default(QueuedAwaiter<T>);
+            QueueAwaiter<T> awaiter = default(QueueAwaiter<T>);
             bool complete = false;
             lock (ThisLock)
             {
@@ -79,13 +82,13 @@ namespace Microsoft.Resource.Runtime
     /// while one that is scheduled will be on the continuation which is a ref type.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public struct QueuedAwaiter<T> : INotifyCompletion
+    public struct QueueAwaiter<T> : INotifyCompletion
     {
         private readonly QueuedAwaiterContinuation<T> _continuation;
         private bool _isCompleted;
         private readonly T _completedResultOnStack;
 
-        private QueuedAwaiter(bool isComplete, T result = default(T))
+        private QueueAwaiter(bool isComplete, T result = default(T))
         {
             _isCompleted = isComplete;
             _completedResultOnStack = result;
@@ -112,14 +115,14 @@ namespace Microsoft.Resource.Runtime
             _continuation.OnCompleted(continuation);
         }
 
-        internal static QueuedAwaiter<T> GetCompletedAwaiter(T result)
+        internal static QueueAwaiter<T> GetCompletedAwaiter(T result)
         {
-            return new QueuedAwaiter<T>(true, result);
+            return new QueueAwaiter<T>(true, result);
         }
 
-        internal static QueuedAwaiter<T> GetAwaiter()
+        internal static QueueAwaiter<T> GetAwaiter()
         {
-            return new QueuedAwaiter<T>(false);
+            return new QueueAwaiter<T>(false);
         }
 
         internal void Complete(T result)
