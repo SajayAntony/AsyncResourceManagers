@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncCompletion.cs" />
+    <Compile Include="AwaitableQueue.cs" />
     <Compile Include="AsyncResourceManager.cs" />
     <Compile Include="AsyncThrottle.cs" />
     <Compile Include="AwaitableThrottle.cs" />
