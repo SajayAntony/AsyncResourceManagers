@@ -14,21 +14,53 @@ namespace Microsoft.Resource.Runtime.Test
         [TestMethod]
         public void Test1Item()
         {
+            TestItem(1);
+        }
+
+        [TestMethod]
+        public void Test2Item()
+        {
+            TestItem(2);
+        }
+
+        [TestMethod]
+        public void Test1000Item()
+        {
+            TestItem(1000);
+        }
+
+
+
+        public void TestItem(int n)
+        {
             var tcs = new TaskCompletionSource<object>();
             var queue = new AwaitableQueue<int>();
 
             Action a = async () =>
             {
-                int val = await queue;
-                Console.WriteLine(val);
+                var builder = new StringBuilder();
+                for (int i = 0; i < n; i++)
+                {
+                    int val = await queue;
+                    if (val != i)
+                    {
+                        tcs.SetException(new InternalTestFailureException(
+                            string.Format("Incorrect values received. Expecting {0} received {1}",i, val)));
+                    }
+                    builder.AppendFormat("{0},", val);
+                }
+                Console.WriteLine(builder.ToString());
                 tcs.SetResult(null);
             };
 
-            Task.Run(a);    
+            Task.Run(a);
 
-            var task = Task.WhenAny(Task.Delay(TimeSpan.FromSeconds(1000)), tcs.Task);
-            Thread.Sleep(1000);
-            queue.Enqueue(10);
+            var task = Task.WhenAny(Task.Delay(TimeSpan.FromSeconds(10)), tcs.Task);
+            Thread.Sleep(100);
+            for (int i = 0; i < n; i++)
+            {
+                queue.Enqueue(i);
+            }
             task.Wait();
             Assert.IsTrue(tcs.Task.IsCompleted, "Task did not complete");
         }
